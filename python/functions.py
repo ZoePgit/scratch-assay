@@ -24,7 +24,7 @@ def print_n_verses(n):
         print("Verse",i)
         print_verse()
         print()
-print_n_verses(3)
+print_n_verses(4)
 
 
 
