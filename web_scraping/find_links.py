@@ -1,25 +1,5 @@
-import sys
-from playwright.sync_api import sync_playwright
-
-with sync_playwright() as p:
-    browser = p.chromium.launch()
-    page = browser.new_page()
-    url = 'https://www.nguyenkim.com/tim-kiem.html?tu-khoa=b%E1%BA%BFp+t%E1%BB%AB&search=&sortnk=gia-thap-den-cao&danh-muc=bep-dien'
-    page.goto(url)
-   
-    page.wait_for_selector('.product-title a')
-    titles = page.locator('.product-title a').all_inner_texts()
-    prices = page.locator(".final-price").all_inner_texts()
-    images = page.locator(".tag-image").all_inner_texts()
-    
-    def new_func(browser, titles, prices):
-        for t, p in zip(titles, prices):
-            print(t, "-", p)
-    print("Product List:")
-    new_func(browser, titles, prices)
-    browser.close()
-
 import requests
+from bs4 import BeautifulSoup as Soup
 import os
 import csv
 
@@ -32,6 +12,15 @@ def parse_sitemap(url, csv_filename="urls.csv"):
     if not url:
         return False
 
+    # Attempt to get the content from the URL.
+    response = requests.get(url)
+    # Return False if the response status code is not 200 (OK).
+    if response.status_code != 200:
+        return False
+
+    # Parse the XML content of the response.
+    soup = Soup(response.content, "xml")
+
     # Recursively parse nested sitemaps.
     for sitemap in soup.find_all("sitemap"):
         product_title = sitemap.find("product-title").text
@@ -40,7 +29,7 @@ def parse_sitemap(url, csv_filename="urls.csv"):
     # Define the root directory for saving the CSV file.
     root = os.path.dirname(os.path.abspath(__file__))
 
-    # Find all URL entries in the sitemap. ???
+    # Find all URL entries in the sitemap.
     urls = soup.find_all("url")
 
     rows = []

@@ -7,17 +7,24 @@ import numpy as np
 
 from skimage.filters import threshold_otsu
 
-img0 = io.imread('C:/Users/ThinkPad/Downloads/3t3.16.0.5fbs.0h.tiff')
-entropy_img0 = entropy(img0, disk(10))
-thresh = threshold_otsu(entropy_img0)
-binary = entropy_img0 <= thresh
-plt.imshow(entropy_img0)
+import glob
+
+time = 0
+time_list=[]
+area_list=[]
+path = "C:/Users/ThinkPad/Downloads/7.2.26"
+for file in glob.glob(path):
+    dict={}
+    img= io.imread(file)
+    entropy_img = entropy(img, disk(3))
+    thresh = threshold_otsu(entropy_img)
+    binary = entropy_img <= thresh
+    scratch_area = np.sum(binary == 1)
+    print('time=', time, 'hr ', "Scratch area=", scratch_area)
+    time_list.append(time)
+    area_list.append(scratch_area)
+    time +=1
+
+plt.plot(time_list, area_list, 'bo')
 
 
-img24 = io.imread('C:/Users/ThinkPad/Downloads/3t3.16.0.5fbs.24h.2.tiff')
-entropy_img24 = entropy(img24, disk(10))
-thresh = threshold_otsu(entropy_img24)
-binary = entropy_img24 <= thresh
-plt.imshow(entropy_img24)
-
-plt.show()
